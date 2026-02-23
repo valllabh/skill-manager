@@ -18,58 +18,91 @@ NC='\033[0m'
 
 VERSION="1.0.0"
 
-list_skills() {
-    local skills=()
-    local statuses=()
+load_skills() {
+    ALL_SKILLS=()
+    ALL_STATUSES=()
 
     for dir in "$SKILLS_DIR"/*/; do
         [ -d "$dir" ] || continue
-        name=$(basename "$dir")
-        skills+=("$name")
-        statuses+=("enabled")
+        ALL_SKILLS+=("$(basename "$dir")")
+        ALL_STATUSES+=("enabled")
     done
 
     for dir in "$DISABLED_DIR"/*/; do
         [ -d "$dir" ] || continue
-        name=$(basename "$dir")
-        skills+=("$name")
-        statuses+=("disabled")
+        ALL_SKILLS+=("$(basename "$dir")")
+        ALL_STATUSES+=("disabled")
     done
-
-    if [ ${#skills[@]} -eq 0 ]; then
-        echo ""
-        echo "No skills found."
-        echo ""
-        return
-    fi
 
     # Sort by name
-    local indices=($(for i in "${!skills[@]}"; do echo "$i ${skills[$i]}"; done | sort -k2 | awk '{print $1}'))
+    local indices=($(for i in "${!ALL_SKILLS[@]}"; do echo "$i ${ALL_SKILLS[$i]}"; done | sort -k2 | awk '{print $1}'))
 
-    echo ""
-    printf "${BOLD}%-4s %-30s %s${NC}\n" "#" "Skill" "Status"
-    printf "%-4s %-30s %s\n" "---" "------------------------------" "--------"
-
-    local count=1
-    for i in "${indices[@]}"; do
-        local status_color
-        if [ "${statuses[$i]}" = "enabled" ]; then
-            status_color="${GREEN}enabled ${NC}"
-        else
-            status_color="${RED}disabled${NC}"
-        fi
-        printf "%-4s %-30s %b\n" "$count" "${skills[$i]}" "$status_color"
-        ((count++))
-    done
-    echo ""
-
-    # Store sorted arrays for interactive use
     SORTED_SKILLS=()
     SORTED_STATUSES=()
     for i in "${indices[@]}"; do
-        SORTED_SKILLS+=("${skills[$i]}")
-        SORTED_STATUSES+=("${statuses[$i]}")
+        SORTED_SKILLS+=("${ALL_SKILLS[$i]}")
+        SORTED_STATUSES+=("${ALL_STATUSES[$i]}")
     done
+}
+
+# Display skills filtered by mode: all, enabled, disabled
+display_skills() {
+    local filter="$1"  # all, enabled, disabled
+
+    load_skills
+
+    if [ ${#SORTED_SKILLS[@]} -eq 0 ]; then
+        echo ""
+        echo "No skills found."
+        echo ""
+        return 1
+    fi
+
+    # Build filtered list
+    DISPLAY_SKILLS=()
+    DISPLAY_STATUSES=()
+    DISPLAY_INDICES=()
+
+    for i in "${!SORTED_SKILLS[@]}"; do
+        if [ "$filter" = "all" ] || [ "$filter" = "${SORTED_STATUSES[$i]}" ]; then
+            DISPLAY_SKILLS+=("${SORTED_SKILLS[$i]}")
+            DISPLAY_STATUSES+=("${SORTED_STATUSES[$i]}")
+            DISPLAY_INDICES+=("$i")
+        fi
+    done
+
+    if [ ${#DISPLAY_SKILLS[@]} -eq 0 ]; then
+        echo ""
+        if [ "$filter" = "disabled" ]; then
+            echo -e "${DIM}No disabled skills found.${NC}"
+        else
+            echo -e "${DIM}No enabled skills found.${NC}"
+        fi
+        echo ""
+        return 1
+    fi
+
+    echo ""
+    printf "${BOLD}%-4s %-2s %-30s${NC}\n" "#" "" "Skill"
+    printf "%-4s %-2s %-30s\n" "---" "--" "------------------------------"
+
+    for i in "${!DISPLAY_SKILLS[@]}"; do
+        local indicator
+        if [ "${DISPLAY_STATUSES[$i]}" = "enabled" ]; then
+            indicator="${GREEN}●${NC}"
+        else
+            indicator="${RED}○${NC}"
+        fi
+        printf "%-4s %b %-30s\n" "$((i + 1))" "$indicator" "${DISPLAY_SKILLS[$i]}"
+    done
+
+    echo ""
+    echo -e "${DIM}● enabled  ○ disabled${NC}"
+    echo ""
+}
+
+list_skills() {
+    display_skills "all"
 }
 
 info_skill() {
@@ -155,42 +188,24 @@ disable_skill() {
 
 interactive_pick() {
     local action="$1"  # toggle, enable, or disable
-    list_skills
+    local filter="all"
 
-    local total=${#SORTED_SKILLS[@]}
-    if [ "$total" -eq 0 ]; then
-        return
+    if [ "$action" = "enable" ]; then
+        filter="disabled"
+    elif [ "$action" = "disable" ]; then
+        filter="enabled"
     fi
 
-    # Filter list based on action
-    local available=()
-    local available_indices=()
+    display_skills "$filter" || return
+
+    local total=${#DISPLAY_SKILLS[@]}
+
     if [ "$action" = "enable" ]; then
-        for i in "${!SORTED_SKILLS[@]}"; do
-            if [ "${SORTED_STATUSES[$i]}" = "disabled" ]; then
-                available+=("${SORTED_SKILLS[$i]}")
-                available_indices+=("$((i + 1))")
-            fi
-        done
-        if [ ${#available[@]} -eq 0 ]; then
-            echo -e "${DIM}All skills are already enabled${NC}"
-            return
-        fi
-        echo -e "${CYAN}Enter numbers of skills to enable (comma separated, or 'all')${NC}"
+        echo -e "${CYAN}Enter numbers to enable (comma separated, or 'all')${NC}"
     elif [ "$action" = "disable" ]; then
-        for i in "${!SORTED_SKILLS[@]}"; do
-            if [ "${SORTED_STATUSES[$i]}" = "enabled" ]; then
-                available+=("${SORTED_SKILLS[$i]}")
-                available_indices+=("$((i + 1))")
-            fi
-        done
-        if [ ${#available[@]} -eq 0 ]; then
-            echo -e "${DIM}All skills are already disabled${NC}"
-            return
-        fi
-        echo -e "${CYAN}Enter numbers of skills to disable (comma separated, or 'all')${NC}"
+        echo -e "${CYAN}Enter numbers to disable (comma separated, or 'all')${NC}"
     else
-        echo -e "${CYAN}Enter skill numbers to toggle (comma separated, or 'all')${NC}"
+        echo -e "${CYAN}Enter numbers to toggle (comma separated, or 'all')${NC}"
     fi
 
     echo -e "${DIM}Press Enter to exit${NC}"
@@ -201,20 +216,22 @@ interactive_pick() {
 
     echo ""
     if [ "$input" = "all" ]; then
-        if [ "$action" = "enable" ]; then
-            for name in "${available[@]}"; do enable_skill "$name"; done
-        elif [ "$action" = "disable" ]; then
-            for name in "${available[@]}"; do disable_skill "$name"; done
-        else
-            for name in "${SORTED_SKILLS[@]}"; do toggle_skill "$name"; done
-        fi
+        for name in "${DISPLAY_SKILLS[@]}"; do
+            if [ "$action" = "enable" ]; then
+                enable_skill "$name"
+            elif [ "$action" = "disable" ]; then
+                disable_skill "$name"
+            else
+                toggle_skill "$name"
+            fi
+        done
     else
         IFS=',' read -ra nums <<< "$input"
         for num in "${nums[@]}"; do
             num=$(echo "$num" | tr -d ' ')
             if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "$total" ]; then
                 local idx=$((num - 1))
-                local name="${SORTED_SKILLS[$idx]}"
+                local name="${DISPLAY_SKILLS[$idx]}"
                 if [ "$action" = "enable" ]; then
                     enable_skill "$name"
                 elif [ "$action" = "disable" ]; then
