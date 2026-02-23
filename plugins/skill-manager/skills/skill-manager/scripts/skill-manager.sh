@@ -16,7 +16,7 @@ BOLD='\033[1m'
 DIM='\033[2m'
 NC='\033[0m'
 
-VERSION="1.2.0"
+VERSION="1.3.0"
 
 load_skills() {
     ALL_SKILLS=()

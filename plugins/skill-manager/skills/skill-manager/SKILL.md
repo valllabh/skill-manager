@@ -1,7 +1,7 @@
 ---
 name: skill-manager
 description: Manage global Claude Code skills. Use when the user says "skill-manager", "manage skills", "list skills", "disable skill", "enable skill", "skill info", or wants to enable, disable, inspect, or list Claude Code skills.
-version: 1.2.0
+version: 1.3.0
 license: MIT
 allowed-tools: Bash
 ---
@@ -20,14 +20,34 @@ When this skill is loaded, a "Base directory for this skill" path is provided. T
 
 Construct the full script path as: `{base_directory}/scripts/skill-manager.sh`
 
-Run the script using the Bash tool. Pass arguments based on the user's request:
+IMPORTANT: The script has an interactive mode that uses stdin, which does NOT work inside Claude Code's Bash tool. Never run the script without arguments or with just `enable`/`disable` (no names). Always use the explicit name based commands.
 
-- `/skill-manager` (no args): `bash "{base_directory}/scripts/skill-manager.sh"`
-- `/skill-manager list`: `bash "{base_directory}/scripts/skill-manager.sh" list`
-- `/skill-manager info <name>`: `bash "{base_directory}/scripts/skill-manager.sh" info <name>`
-- `/skill-manager enable`: `bash "{base_directory}/scripts/skill-manager.sh" enable`
-- `/skill-manager enable <names>`: `bash "{base_directory}/scripts/skill-manager.sh" enable <names>`
-- `/skill-manager disable`: `bash "{base_directory}/scripts/skill-manager.sh" disable`
-- `/skill-manager disable <names>`: `bash "{base_directory}/scripts/skill-manager.sh" disable <names>`
+## Flow for all requests
 
-Always show the output directly to the user.
+### `/skill-manager` or `/skill-manager list`
+Run: `bash "{base_directory}/scripts/skill-manager.sh" list`
+Show the output to the user.
+
+### `/skill-manager info <name>`
+Run: `bash "{base_directory}/scripts/skill-manager.sh" info <name>`
+Show the output to the user.
+
+### `/skill-manager enable` (no names given)
+1. Run: `bash "{base_directory}/scripts/skill-manager.sh" list`
+2. Show the list to the user
+3. Ask the user which disabled skills (marked with empty circle) they want to enable
+4. Run: `bash "{base_directory}/scripts/skill-manager.sh" enable <name1> <name2> ...`
+
+### `/skill-manager enable <names>`
+Run: `bash "{base_directory}/scripts/skill-manager.sh" enable <names>`
+
+### `/skill-manager disable` (no names given)
+1. Run: `bash "{base_directory}/scripts/skill-manager.sh" list`
+2. Show the list to the user
+3. Ask the user which enabled skills (marked with filled circle) they want to disable
+4. Run: `bash "{base_directory}/scripts/skill-manager.sh" disable <name1> <name2> ...`
+
+### `/skill-manager disable <names>`
+Run: `bash "{base_directory}/scripts/skill-manager.sh" disable <names>`
+
+Always show script output directly to the user.
