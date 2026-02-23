@@ -10,24 +10,18 @@ skill-manager gives you granular control. Disable what you do not need, enable i
 
 ## Install
 
-### As a Claude Code Plugin
-
 ```bash
-claude plugin install valllabh/skill-manager
-```
+# Add the marketplace
+claude marketplace add valllabh/skill-manager
 
-### Manual (local development)
-
-```bash
-git clone https://github.com/valllabh/skill-manager.git
-cd skill-manager
-claude plugin install --local .
+# Install the plugin
+claude plugin install skill-manager@valllabh-skill-manager
 ```
 
 ## Uninstall
 
 ```bash
-claude plugin uninstall skill-manager
+claude plugin uninstall skill-manager@valllabh-skill-manager
 ```
 
 ## Usage
@@ -49,10 +43,10 @@ Use the `/skill-manager` slash command:
 Run the script directly:
 
 ```bash
-bash skills/skill-manager/scripts/skill-manager.sh list
-bash skills/skill-manager/scripts/skill-manager.sh info jira-create
-bash skills/skill-manager/scripts/skill-manager.sh enable jira-create
-bash skills/skill-manager/scripts/skill-manager.sh disable jira-create jira-get
+bash plugins/skill-manager/skills/skill-manager/scripts/skill-manager.sh list
+bash plugins/skill-manager/skills/skill-manager/scripts/skill-manager.sh info jira-create
+bash plugins/skill-manager/skills/skill-manager/scripts/skill-manager.sh enable jira-create
+bash plugins/skill-manager/skills/skill-manager/scripts/skill-manager.sh disable jira-create jira-get
 ```
 
 ## How it works
@@ -80,15 +74,18 @@ These are tracked upstream and may be addressed in future versions.
 ```
 skill-manager/
   .claude-plugin/
-    plugin.json              Plugin manifest
-  skills/
+    marketplace.json           Marketplace manifest
+  plugins/
     skill-manager/
-      SKILL.md               Skill definition
-      scripts/
-        skill-manager.sh     Management script
+      .claude-plugin/
+        plugin.json            Plugin manifest
+      skills/
+        skill-manager/
+          SKILL.md             Skill definition
+          scripts/
+            skill-manager.sh   Management script
   README.md
   LICENSE
-  CHANGELOG.md
 ```
 
 ## License

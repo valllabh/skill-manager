@@ -15,7 +15,7 @@
         "name": "Vallabh Joshi",
         "email": "vallabh.joshi@gmail.com"
       },
-      "source": ".",
+      "source": "./plugins/skill-manager",
       "category": "productivity"
     }
   ]
