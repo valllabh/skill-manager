@@ -1,7 +1,7 @@
 ---
 name: skill-manager
 description: Manage global Claude Code skills. Use when the user says "skill-manager", "manage skills", "list skills", "disable skill", "enable skill", "skill info", or wants to enable, disable, inspect, or list Claude Code skills.
-version: 1.1.0
+version: 1.2.0
 license: MIT
 allowed-tools: Bash
 ---
