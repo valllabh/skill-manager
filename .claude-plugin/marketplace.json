@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "valllabh-skill-manager",
+  "description": "Skill management plugin for Claude Code",
+  "owner": {
+    "name": "Vallabh Joshi",
+    "email": "valllabh@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "skill-manager",
+      "description": "Manage global Claude Code skills. List, enable, disable, and inspect skills.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Vallabh Joshi",
+        "email": "valllabh@gmail.com"
+      },
+      "source": ".",
+      "category": "productivity"
+    }
+  ]
+}
