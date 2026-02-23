@@ -3,6 +3,7 @@ name: skill-manager
 description: Manage global Claude Code skills. Use when the user says "skill-manager", "manage skills", "list skills", "disable skill", "enable skill", "skill info", or wants to enable, disable, inspect, or list Claude Code skills.
 version: 1.1.0
 license: MIT
+allowed-tools: Bash
 ---
 
 # Skill Manager
@@ -15,20 +16,18 @@ Moves skill folders between `~/.claude/skills/` (active) and `~/.claude/skills-d
 
 ## Instructions
 
-The management script is located at `scripts/skill-manager.sh` relative to this SKILL.md file.
+When this skill is loaded, a "Base directory for this skill" path is provided. The script is at `scripts/skill-manager.sh` inside that base directory.
 
-Run the script using the Bash tool based on the user's request:
+Construct the full script path as: `{base_directory}/scripts/skill-manager.sh`
 
-| User Request | Command |
-|---|---|
-| `/skill-manager` or no args | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh` |
-| `/skill-manager list` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh list` |
-| `/skill-manager info <name>` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh info <name>` |
-| `/skill-manager enable` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh enable` |
-| `/skill-manager enable <names>` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh enable <names>` |
-| `/skill-manager disable` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh disable` |
-| `/skill-manager disable <names>` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh disable <names>` |
+Run the script using the Bash tool. Pass arguments based on the user's request:
 
-Where `<PLUGIN_DIR>` is the directory containing the `.claude-plugin/` folder. Resolve this by finding the `scripts/skill-manager.sh` file relative to this SKILL.md file's location.
+- `/skill-manager` (no args): `bash "{base_directory}/scripts/skill-manager.sh"`
+- `/skill-manager list`: `bash "{base_directory}/scripts/skill-manager.sh" list`
+- `/skill-manager info <name>`: `bash "{base_directory}/scripts/skill-manager.sh" info <name>`
+- `/skill-manager enable`: `bash "{base_directory}/scripts/skill-manager.sh" enable`
+- `/skill-manager enable <names>`: `bash "{base_directory}/scripts/skill-manager.sh" enable <names>`
+- `/skill-manager disable`: `bash "{base_directory}/scripts/skill-manager.sh" disable`
+- `/skill-manager disable <names>`: `bash "{base_directory}/scripts/skill-manager.sh" disable <names>`
 
 Always show the output directly to the user.
