@@ -10,18 +10,18 @@ skill-manager gives you granular control. Disable what you do not need, enable i
 
 ## Install
 
-```bash
-# Add the marketplace
-claude marketplace add valllabh/skill-manager
+From within Claude Code, run:
 
-# Install the plugin
-claude plugin install skill-manager@valllabh-skill-manager
 ```
+/plugin install valllabh/skill-manager
+```
+
+Restart Claude Code after installation.
 
 ## Uninstall
 
-```bash
-claude plugin uninstall skill-manager@valllabh-skill-manager
+```
+/plugin uninstall skill-manager
 ```
 
 ## Usage
@@ -40,13 +40,10 @@ Use the `/skill-manager` slash command:
 
 ### Terminal
 
-Run the script directly:
+Once installed, the script is available at the plugin cache path:
 
 ```bash
-bash plugins/skill-manager/skills/skill-manager/scripts/skill-manager.sh list
-bash plugins/skill-manager/skills/skill-manager/scripts/skill-manager.sh info jira-create
-bash plugins/skill-manager/skills/skill-manager/scripts/skill-manager.sh enable jira-create
-bash plugins/skill-manager/skills/skill-manager/scripts/skill-manager.sh disable jira-create jira-get
+~/.claude/plugins/cache/valllabh-skill-manager/skill-manager/*/skills/skill-manager/scripts/skill-manager.sh list
 ```
 
 ## How it works
