@@ -34,8 +34,10 @@ Use the `/skill-manager` slash command:
 /skill-manager              Interactive mode (numbered list, pick to toggle)
 /skill-manager list         Show all skills with status
 /skill-manager info <name>  Show details about a specific skill
-/skill-manager enable <n>   Enable skill(s) by name
-/skill-manager disable <n>  Disable skill(s) by name
+/skill-manager enable        Interactive picker for disabled skills
+/skill-manager enable <n>    Enable skill(s) by name
+/skill-manager disable       Interactive picker for enabled skills
+/skill-manager disable <n>   Disable skill(s) by name
 ```
 
 ### Terminal

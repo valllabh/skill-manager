@@ -153,7 +153,8 @@ disable_skill() {
     fi
 }
 
-interactive_toggle() {
+interactive_pick() {
+    local action="$1"  # toggle, enable, or disable
     list_skills
 
     local total=${#SORTED_SKILLS[@]}
@@ -161,7 +162,37 @@ interactive_toggle() {
         return
     fi
 
-    echo -e "${CYAN}Enter skill numbers to toggle (comma separated, or 'all')${NC}"
+    # Filter list based on action
+    local available=()
+    local available_indices=()
+    if [ "$action" = "enable" ]; then
+        for i in "${!SORTED_SKILLS[@]}"; do
+            if [ "${SORTED_STATUSES[$i]}" = "disabled" ]; then
+                available+=("${SORTED_SKILLS[$i]}")
+                available_indices+=("$((i + 1))")
+            fi
+        done
+        if [ ${#available[@]} -eq 0 ]; then
+            echo -e "${DIM}All skills are already enabled${NC}"
+            return
+        fi
+        echo -e "${CYAN}Enter numbers of skills to enable (comma separated, or 'all')${NC}"
+    elif [ "$action" = "disable" ]; then
+        for i in "${!SORTED_SKILLS[@]}"; do
+            if [ "${SORTED_STATUSES[$i]}" = "enabled" ]; then
+                available+=("${SORTED_SKILLS[$i]}")
+                available_indices+=("$((i + 1))")
+            fi
+        done
+        if [ ${#available[@]} -eq 0 ]; then
+            echo -e "${DIM}All skills are already disabled${NC}"
+            return
+        fi
+        echo -e "${CYAN}Enter numbers of skills to disable (comma separated, or 'all')${NC}"
+    else
+        echo -e "${CYAN}Enter skill numbers to toggle (comma separated, or 'all')${NC}"
+    fi
+
     echo -e "${DIM}Press Enter to exit${NC}"
     printf "> "
     read -r input
@@ -170,16 +201,27 @@ interactive_toggle() {
 
     echo ""
     if [ "$input" = "all" ]; then
-        for name in "${SORTED_SKILLS[@]}"; do
-            toggle_skill "$name"
-        done
+        if [ "$action" = "enable" ]; then
+            for name in "${available[@]}"; do enable_skill "$name"; done
+        elif [ "$action" = "disable" ]; then
+            for name in "${available[@]}"; do disable_skill "$name"; done
+        else
+            for name in "${SORTED_SKILLS[@]}"; do toggle_skill "$name"; done
+        fi
     else
         IFS=',' read -ra nums <<< "$input"
         for num in "${nums[@]}"; do
             num=$(echo "$num" | tr -d ' ')
             if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "$total" ]; then
                 local idx=$((num - 1))
-                toggle_skill "${SORTED_SKILLS[$idx]}"
+                local name="${SORTED_SKILLS[$idx]}"
+                if [ "$action" = "enable" ]; then
+                    enable_skill "$name"
+                elif [ "$action" = "disable" ]; then
+                    disable_skill "$name"
+                else
+                    toggle_skill "$name"
+                fi
             else
                 echo -e "  ${YELLOW}Invalid:${NC} $num"
             fi
@@ -199,8 +241,8 @@ show_help() {
     echo "  skill-manager              Interactive mode"
     echo "  skill-manager list         Show all skills with status"
     echo "  skill-manager info <name>  Show details about a skill"
-    echo "  skill-manager enable  <n>  Enable skill(s) by name"
-    echo "  skill-manager disable <n>  Disable skill(s) by name"
+    echo "  skill-manager enable [n]   Enable skill(s), interactive if no name given"
+    echo "  skill-manager disable [n]  Disable skill(s), interactive if no name given"
     echo "  skill-manager help         Show this help"
     echo "  skill-manager version      Show version"
     echo ""
@@ -224,17 +266,23 @@ case "${1:-}" in
         ;;
     enable)
         shift
-        [ $# -eq 0 ] && { echo "Usage: skill-manager enable <name1> <name2> ..."; exit 1; }
-        echo ""
-        for name in "$@"; do enable_skill "$name"; done
-        echo ""
+        if [ $# -eq 0 ]; then
+            interactive_pick "enable"
+        else
+            echo ""
+            for name in "$@"; do enable_skill "$name"; done
+            echo ""
+        fi
         ;;
     disable)
         shift
-        [ $# -eq 0 ] && { echo "Usage: skill-manager disable <name1> <name2> ..."; exit 1; }
-        echo ""
-        for name in "$@"; do disable_skill "$name"; done
-        echo ""
+        if [ $# -eq 0 ]; then
+            interactive_pick "disable"
+        else
+            echo ""
+            for name in "$@"; do disable_skill "$name"; done
+            echo ""
+        fi
         ;;
     help|--help|-h)
         show_help
@@ -243,6 +291,6 @@ case "${1:-}" in
         echo "skill-manager v${VERSION}"
         ;;
     *)
-        interactive_toggle
+        interactive_pick "toggle"
         ;;
 esac

@@ -24,7 +24,9 @@ Run the script using the Bash tool based on the user's request:
 | `/skill-manager` or no args | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh` |
 | `/skill-manager list` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh list` |
 | `/skill-manager info <name>` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh info <name>` |
+| `/skill-manager enable` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh enable` |
 | `/skill-manager enable <names>` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh enable <names>` |
+| `/skill-manager disable` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh disable` |
 | `/skill-manager disable <names>` | `bash <PLUGIN_DIR>/skills/skill-manager/scripts/skill-manager.sh disable <names>` |
 
 Where `<PLUGIN_DIR>` is the directory containing the `.claude-plugin/` folder. Resolve this by finding the `scripts/skill-manager.sh` file relative to this SKILL.md file's location.
