@@ -13,7 +13,8 @@ skill-manager gives you granular control. Disable what you do not need, enable i
 From within Claude Code, run:
 
 ```
-/plugin install valllabh/skill-manager
+/plugin marketplace add valllabh/skill-manager
+/plugin install skill-manager
 ```
 
 Restart Claude Code after installation.
@@ -22,6 +23,7 @@ Restart Claude Code after installation.
 
 ```
 /plugin uninstall skill-manager
+/plugin marketplace remove
 ```
 
 ## Usage
